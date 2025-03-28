@@ -37,7 +37,28 @@
 #
 ####################################################################
 
-include make.inc
+#  Modify the FORTRAN and OPTS definitions to the desired compiler
+#  and desired compiler options for your machine.  NOOPT refers to
+#  the compiler options desired when NO OPTIMIZATION is selected.
+#
+FC ?= gfortran
+OPTS = -O3 
+
+#  The archiver and the flag(s) to use when building an archive
+#  (library).  If your system has no ranlib, set RANLIB = echo.
+#
+ARCH = ar
+ARCHFLAGS = cr
+
+#  The location of the libraries to which you will link.  (The
+#  machine-specific, optimized BLAS library should be used whenever
+#  possible.)
+#
+
+BUILD_DIR ?= build
+
+LPKAUXLIB    = liblpkaux.a
+SLICOTLIB    = libslicot.a
 
 AUX_SRC = $(wildcard src_aux/*.f)
 AUX_OBJS = $(patsubst src_aux/%.f, $(BUILD_DIR)/src_aux/%.o, $(AUX_SRC))
@@ -52,13 +73,13 @@ main_lib: $(MAIN_OBJS)
 	$(ARCH) $(ARCHFLAGS) $(BUILD_DIR)/$(SLICOTLIB) $(MAIN_OBJS)
 
 $(BUILD_DIR)/src/%.o: src/%.f | $(BUILD_DIR)
-	$(FORTRAN) $(OPTS) -c $< -o $@
+	$(FC) $(OPTS) -c $< -o $@
 
 lib_aux: $(AUX_OBJS)
 	$(ARCH) $(ARCHFLAGS) $(BUILD_DIR)/$(LPKAUXLIB) $(AUX_OBJS)
 
 $(BUILD_DIR)/src_aux/%.o: src_aux/%.f | $(BUILD_DIR)
-	$(FORTRAN) $(OPTS) -c $< -o $@
+	$(FC) $(OPTS) -c $< -o $@
 
 clean:
 	rm -rf $(BUILD_DIR)
